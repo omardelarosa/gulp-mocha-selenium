@@ -18,9 +18,15 @@ module.exports = function (options) {
 
   var mocha = new Mocha(options);
   var cache = {};
+  var configPath = options.configPath;
+  var isRetry = options.isRetry || false;
 
   for (var key in require.cache) {
     cache[key] = true;
+  }
+
+  function sessionHid () {
+    return Math.random().toString('16').slice(2);
   }
 
   function clearCache() {
@@ -75,8 +81,15 @@ module.exports = function (options) {
     );
 
     mocha.suite.on('pre-require', function (context, file, m) {
-      this.ctx.wd = wd;
-      this.ctx.browser = browser;
+      context.wd = wd;
+      context.browser = browser;
+      context.config = require(configPath);
+      context.c = context.config.data;
+      context.h = context.config.helpers;
+      context.CSS = context.config.selectors;
+      context.id = sessionHid();
+      context.isGulp = true;
+      context.isRetry = isRetry;
     });
 
     browser.on('status', function(info){
