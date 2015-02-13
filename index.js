@@ -107,6 +107,7 @@ module.exports = function (options) {
 
       function handleException(err) {
         clearCache();
+        console.log(err.stack)
         browser.quit(function() {
           if (selenium.kill) {
             selenium.kill();
@@ -121,10 +122,9 @@ module.exports = function (options) {
         try {
           mocha.run(function (errCount) {
             clearCache();
-
             if (errCount > 0) {
               stream.emit('error', new gutil.PluginError('gulp-mocha', errCount + ' ' + (errCount === 1 ? 'test' : 'tests') + ' failed.', {
-                showStack: false
+                showStack: true
               }));
             }
 
